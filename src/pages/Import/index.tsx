@@ -23,19 +23,27 @@ const Import: React.FC = () => {
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    // const data = new FormData();
-
-    // TODO
-
     try {
-      // await api.post('/transactions/import', data);
+      const data = new FormData();
+      const promiseList = uploadedFiles.map(fileToUpload => {
+        data.set('file', fileToUpload.file);
+        return api.post('/transactions/import', data);
+      });
+      await Promise.all(promiseList);
+      setUploadedFiles([]);
+      history.goBack();
     } catch (err) {
-      // console.log(err.response.error);
+      console.log(err.response.error);
     }
   }
 
   function submitFile(files: File[]): void {
-    // TODO
+    const uploadedFile: FileProps = {
+      file: files[0],
+      name: files[0].name,
+      readableSize: filesize(files[0].size),
+    };
+    setUploadedFiles([...uploadedFiles, uploadedFile]);
   }
 
   return (
